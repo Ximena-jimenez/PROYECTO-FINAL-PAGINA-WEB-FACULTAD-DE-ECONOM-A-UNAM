@@ -66,7 +66,7 @@ nav a:hover{color:var(--dorado);border-bottom-color:var(--dorado)}
 
 /* HERO BANNER */
 .hero{max-width:1100px;margin:2rem auto 0;border-radius:0 var(--radio) var(--radio) 0;border-left:6px solid var(--dorado);overflow:hidden;display:flex;align-items:stretch;background:var(--blanco);box-shadow:var(--sombra)}
-.hero-foto{width:220px;flex-shrink:0;background:#dde3ee;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#8899bb;text-align:center;padding:1rem}
+.hero-foto{width:320px;flex-shrink:0;background:#dde3ee;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#8899bb;text-align:center;padding:0;min-height:200px;overflow:hidden}
 .hero-foto img{width:100%;height:100%;object-fit:cover}
 .hero-texto{padding:1.6rem 2rem;background:linear-gradient(100deg,var(--dorado-cl) 0%,var(--azul-claro) 100%)}
 .hero-texto h2{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--azul);margin-bottom:.4rem}
@@ -544,30 +544,50 @@ footer .presentacion{color:var(--dorado);font-weight:700;font-size:.9rem;margin-
 
 </div>
 
-<!-- ACERCA DE NUESTRA FACULTAD -->
+<!-- ACERCA DE LA FACULTAD -->
 <div class="banda" id="acerca">
-  <h2 class="banda-titulo">Acerca de Nuestra Facultad de Economía</h2>
+  <h2 class="banda-titulo">Acerca de la Facultad de Economía</h2>
   <div class="acerca-layout">
     <div>
       <div id="mapa-facultad"></div>
       <p style="font-size:.78rem;color:var(--texto-sub);margin-top:.4rem">Circuito Interior s/n, Ciudad Universitaria, Coyoacán, CDMX</p>
+      <p style="font-size:.88rem;color:var(--texto);line-height:1.75;margin-top:1rem;padding:1rem;background:var(--azul-claro);border-radius:var(--radio);border-left:4px solid var(--azul)">
+        La Facultad de Economía de la UNAM es la dependencia académica encargada de la docencia e investigación en ciencias económicas. Su objetivo es el análisis científico de la producción, distribución y consumo de bienes, formando profesionales críticos que participen en la solución de problemas económicos, sociales y financieros de México.
+      </p>
     </div>
     <div>
       <div class="fotos-facultad">
-        <!-- Sube foto-campus-1.jpg, foto-campus-2.jpg, foto-campus-3.jpg a GitHub -->
         <div class="foto-slot foto-slot-grande">
           <img src="foto-campus-1.jpg" alt="Facultad de Economía"
-            onerror="this.parentElement.innerHTML='Sube foto-campus-1.jpg'"/>
+            onerror="this.parentElement.innerHTML='foto-campus-1.jpg'"/>
         </div>
         <div class="foto-slot">
           <img src="foto-campus-2.jpg" alt="Campus"
-            onerror="this.parentElement.innerHTML='Sube foto-campus-2.jpg'"/>
+            onerror="this.parentElement.innerHTML='foto-campus-2.jpg'"/>
         </div>
         <div class="foto-slot">
           <img src="foto-campus-3.jpg" alt="Campus"
-            onerror="this.parentElement.innerHTML='Sube foto-campus-3.jpg'"/>
+            onerror="this.parentElement.innerHTML='foto-campus-3.jpg'"/>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- GALERÍA EXTRA -->
+<div class="banda">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem">
+    <div class="foto-slot" style="min-height:180px">
+      <img src="foto-extra-1.jpg" alt="Foto extra 1"
+        onerror="this.parentElement.innerHTML='foto-extra-1.jpg'"/>
+    </div>
+    <div class="foto-slot" style="min-height:180px">
+      <img src="foto-extra-2.jpg" alt="Foto extra 2"
+        onerror="this.parentElement.innerHTML='foto-extra-2.jpg'"/>
+    </div>
+    <div class="foto-slot" style="min-height:180px">
+      <img src="foto-extra-3.jpg" alt="Foto extra 3"
+        onerror="this.parentElement.innerHTML='foto-extra-3.jpg'"/>
     </div>
   </div>
 </div>
