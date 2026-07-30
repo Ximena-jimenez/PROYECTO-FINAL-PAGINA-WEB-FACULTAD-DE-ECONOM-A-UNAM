@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Facultad de Economía — UNAM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet"/>
+<!-- Leaflet para mapa -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Chart.js para gráfica -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+:root {
+  --azul:      #003f8a;
+  --azul-med:  #0055b3;
+  --azul-claro:#e8f0fb;
+  --dorado:    #c8960c;
+  --dorado-cl: #fdf3d0;
+  --gris-bg:   #f5f6f8;
+  --gris-borde:#dde1ea;
+  --texto:     #1a1e2e;
+  --texto-sub: #4a5068;
+  --blanco:    #ffffff;
+  --radio:     10px;
+  --sombra:    0 4px 24px rgba(0,30,80,.09);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Source Serif 4',Georgia,serif;background:var(--gris-bg);color:var(--texto);line-height:1.7}
+
+/* TOPBAR */
+.topbar{background:var(--azul);color:#b8cde8;font-size:.78rem;padding:.4rem 2rem;display:flex;justify-content:space-between;letter-spacing:.03em}
+.topbar a{color:#b8cde8;text-decoration:none}.topbar a:hover{color:#fff}
+
+/* NOTA PROYECTO */
+.nota-proyecto{background:#fdf3d0;border-bottom:2px solid #c8960c;padding:.55rem 2rem;text-align:center;font-size:.82rem;color:#7a5800;line-height:1.6}
+
+/* HEADER */
+header{background:linear-gradient(135deg,#001f4e 0%,#003f8a 55%,#0055b3 100%);color:var(--blanco);padding:2rem 2rem 1.8rem;position:relative;overflow:hidden}
+header::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(200,150,12,.12) 0%,transparent 60%),repeating-linear-gradient(-45deg,transparent 0px,transparent 18px,rgba(255,255,255,.025) 18px,rgba(255,255,255,.025) 19px);pointer-events:none}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:1.5rem;position:relative;z-index:1}
+.header-logos{display:flex;align-items:center;gap:1.5rem;flex-shrink:0}
+.header-logos img{height:115px;width:auto;filter:drop-shadow(0 2px 8px rgba(0,0,0,.45))}
+.header-text h1{font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.4rem,3vw,2.2rem);font-weight:900;line-height:1.15}
+.header-text .sub{font-size:.9rem;color:#a8c4e0;margin-top:.3rem;font-style:italic;font-weight:300}
+.dorado{color:var(--dorado)}
+
+/* NAV */
+nav{background:var(--blanco);border-bottom:3px solid var(--dorado);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;overflow-x:auto}
+nav a{display:inline-block;padding:.8rem 1.3rem;color:var(--azul);text-decoration:none;font-size:.88rem;font-weight:600;border-bottom:3px solid transparent;margin-bottom:-3px;white-space:nowrap;transition:color .2s,border-color .2s}
+nav a:hover{color:var(--dorado);border-bottom-color:var(--dorado)}
+
+/* OBJETIVOS */
+.objetivos-band{background:var(--azul);color:var(--blanco);padding:1.8rem 2rem}
+.objetivos-inner{max-width:1100px;margin:0 auto}
+.objetivos-inner h2{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--dorado);margin-bottom:.8rem;letter-spacing:.06em;text-transform:uppercase}
+.objetivos-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:.8rem}
+.obj-item{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:.9rem 1.1rem}
+.obj-item h3{font-size:.85rem;font-weight:700;color:var(--dorado);margin-bottom:.3rem;letter-spacing:.04em}
+.obj-item p{font-size:.8rem;color:#b8cde8;line-height:1.5}
+
+/* HERO BANNER */
+.hero{max-width:1100px;margin:2rem auto 0;border-radius:0 var(--radio) var(--radio) 0;border-left:6px solid var(--dorado);overflow:hidden;display:flex;align-items:stretch;background:var(--blanco);box-shadow:var(--sombra)}
+.hero-foto{width:320px;flex-shrink:0;background:#dde3ee;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#8899bb;text-align:center;padding:0;min-height:200px;overflow:hidden}
+.hero-foto img{width:100%;height:100%;object-fit:cover}
+.hero-texto{padding:1.6rem 2rem;background:linear-gradient(100deg,var(--dorado-cl) 0%,var(--azul-claro) 100%)}
+.hero-texto h2{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--azul);margin-bottom:.4rem}
+.hero-texto p{color:var(--texto-sub);font-size:.92rem}
+
+/* MAIN GRID */
+main{max-width:1100px;margin:2rem auto 3rem;padding:0 1.5rem;display:grid;grid-template-columns:1fr 300px;gap:2rem;align-items:start}
+@media(max-width:820px){main{grid-template-columns:1fr}.hero{margin:1.5rem 1rem 0}.hero-foto{display:none}}
+
+.seccion-titulo{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--azul);margin-bottom:1rem;padding-bottom:.4rem;border-bottom:2px solid var(--gris-borde)}
+
+/* ANUNCIOS */
+.grid-anuncios{display:flex;flex-direction:column;gap:1rem}
+.card-anuncio{background:var(--blanco);border:1px solid var(--gris-borde);border-left:4px solid var(--azul-med);border-radius:var(--radio);padding:1.3rem 1.5rem;box-shadow:var(--sombra);transition:transform .2s,box-shadow .2s}
+.card-anuncio:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,30,80,.13)}
+.card-header-row{margin-bottom:.5rem}
+.badge{display:inline-block;font-size:.7rem;font-weight:700;padding:.18rem .6rem;border-radius:50px;letter-spacing:.04em;text-transform:uppercase}
+.card-anuncio h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--texto);margin-bottom:.4rem;line-height:1.3}
+.card-meta{display:flex;flex-wrap:wrap;gap:.6rem;font-size:.8rem;color:var(--texto-sub);margin-bottom:.5rem}
+.card-desc{font-size:.87rem;color:var(--texto-sub);line-height:1.6}
+.btn-ver{display:inline-block;margin-top:.8rem;font-size:.8rem;font-weight:700;color:var(--azul-med);text-decoration:none;transition:color .2s}
+.btn-ver:hover{color:var(--dorado)}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:1.4rem}
+.widget{background:var(--blanco);border:1px solid var(--gris-borde);border-radius:var(--radio);padding:1.3rem;box-shadow:var(--sombra)}
+.widget-titulo{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--azul);margin-bottom:.9rem;padding-bottom:.4rem;border-bottom:1px solid var(--gris-borde);text-transform:uppercase;letter-spacing:.05em}
+
+.card-carrera{background:var(--azul-claro);border:1px solid var(--gris-borde);border-radius:8px;padding:.9rem;margin-bottom:.7rem}
+.card-carrera:last-child{margin-bottom:0}
+.card-carrera h3{font-family:'Playfair Display',serif;font-size:.9rem;color:var(--azul);margin-bottom:.25rem}
+.card-carrera p{font-size:.8rem;color:var(--texto-sub);line-height:1.5}
+
+.links-rapidos{list-style:none}
+.links-rapidos li{border-bottom:1px solid var(--gris-borde)}
+.links-rapidos li:last-child{border-bottom:none}
+.links-rapidos a{display:flex;align-items:center;gap:.5rem;padding:.55rem 0;color:var(--azul-med);text-decoration:none;font-size:.85rem;font-weight:600;transition:color .2s}
+.links-rapidos a:hover{color:var(--dorado)}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.stat-box{background:linear-gradient(135deg,var(--azul) 0%,#0055b3 100%);color:white;border-radius:8px;padding:.75rem;text-align:center}
+.stat-num{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;color:var(--dorado);display:block}
+.stat-label{font-size:.68rem;opacity:.85;letter-spacing:.03em}
+
+.contacto-info p{font-size:.85rem;color:var(--texto-sub);margin-bottom:.4rem;display:flex;gap:.4rem;align-items:flex-start}
+
+/* SECCIONES ANCHAS (fuera del grid principal) */
+.banda{max-width:1100px;margin:0 auto 2.5rem;padding:0 1.5rem}
+.banda-titulo{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--azul);margin-bottom:1.2rem;padding-bottom:.5rem;border-bottom:2px solid var(--gris-borde);text-transform:uppercase;letter-spacing:.05em}
+
+/* NOTICIAS */
+.noticias-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+@media(max-width:640px){.noticias-grid{grid-template-columns:1fr}}
+.card-noticia{background:var(--blanco);border:1px solid var(--gris-borde);border-top:4px solid var(--dorado);border-radius:var(--radio);padding:1.3rem 1.5rem;box-shadow:var(--sombra)}
+.card-noticia .fuente{font-size:.72rem;font-weight:700;color:var(--dorado);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.4rem}
+.card-noticia h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--texto);margin-bottom:.5rem;line-height:1.3}
+.card-noticia p{font-size:.85rem;color:var(--texto-sub);line-height:1.6;margin-bottom:.7rem}
+.card-noticia a{font-size:.8rem;font-weight:700;color:var(--azul-med);text-decoration:none}
+.card-noticia a:hover{color:var(--dorado)}
+
+/* BIBLIOGRAFÍA */
+.biblio-grid{display:flex;flex-direction:column;gap:.8rem}
+.biblio-item{background:var(--blanco);border:1px solid var(--gris-borde);border-left:4px solid var(--azul);border-radius:var(--radio);padding:1rem 1.3rem;box-shadow:var(--sombra)}
+.biblio-autor{font-weight:700;color:var(--azul);font-size:.9rem;margin-bottom:.15rem}
+.biblio-obra{font-style:italic;font-size:.88rem;color:var(--texto);margin-bottom:.25rem}
+.biblio-desc{font-size:.82rem;color:var(--texto-sub);line-height:1.55}
+
+/* ECONOMÍA DIDÁCTICA */
+.didactica-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:700px){.didactica-grid{grid-template-columns:1fr}}
+.didactica-card{background:var(--blanco);border:1px solid var(--gris-borde);border-radius:var(--radio);padding:1.4rem;box-shadow:var(--sombra)}
+.didactica-card h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--azul);margin-bottom:.9rem;padding-bottom:.4rem;border-bottom:1px solid var(--gris-borde)}
+.tipo-cambio-form{display:flex;flex-direction:column;gap:.7rem}
+.tipo-cambio-form label{font-size:.82rem;font-weight:600;color:var(--texto-sub)}
+.tipo-cambio-form input,
+.tipo-cambio-form select{width:100%;padding:.55rem .8rem;border:1px solid var(--gris-borde);border-radius:6px;font-size:.88rem;font-family:inherit;color:var(--texto)}
+.btn-calc{background:var(--azul);color:white;border:none;border-radius:6px;padding:.6rem 1.2rem;font-size:.88rem;font-weight:700;cursor:pointer;transition:background .2s;font-family:inherit}
+.btn-calc:hover{background:var(--azul-med)}
+.resultado-tc{margin-top:.7rem;background:var(--azul-claro);border-radius:6px;padding:.7rem 1rem;font-size:.95rem;font-weight:600;color:var(--azul);min-height:2.2rem;text-align:center}
+.grafica-nota{font-size:.8rem;color:var(--texto-sub);margin-top:.7rem;line-height:1.5;font-style:italic}
+
+/* ACERCA — mapa y fotos */
+.acerca-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:700px){.acerca-layout{grid-template-columns:1fr}}
+#mapa-facultad{height:280px;border-radius:var(--radio);border:1px solid var(--gris-borde)}
+.fotos-facultad{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.foto-slot{background:#dde3ee;border-radius:8px;border:2px dashed var(--gris-borde);display:flex;align-items:center;justify-content:center;min-height:120px;overflow:hidden;font-size:.7rem;color:#8899bb;text-align:center;padding:.5rem}
+.foto-slot img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+.foto-slot-grande{grid-column:1/-1;min-height:140px}
+
+/* FOOTER */
+footer{background:#001635;color:#8aa4c8;text-align:center;padding:2rem 1rem;font-size:.82rem;line-height:1.9}
+footer strong{color:#c8d8ee}
+footer .presentacion{color:var(--dorado);font-weight:700;font-size:.9rem;margin-top:.5rem;letter-spacing:.04em}
+
+/* FORO DE OPINIONES */
+.foro-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start}
+@media(max-width:700px){.foro-layout{grid-template-columns:1fr}}
+.foro-form-card{background:var(--blanco);border:1px solid var(--gris-borde);border-top:4px solid var(--azul);border-radius:var(--radio);padding:1.4rem;box-shadow:var(--sombra)}
+.foro-form-card h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--azul);margin-bottom:1rem;padding-bottom:.4rem;border-bottom:1px solid var(--gris-borde)}
+.foro-input{width:100%;padding:.6rem .9rem;border:1px solid var(--gris-borde);border-radius:6px;font-size:.88rem;font-family:inherit;color:var(--texto);margin-bottom:.7rem;transition:border-color .2s}
+.foro-input:focus{outline:none;border-color:var(--azul-med)}
+.foro-textarea{width:100%;padding:.6rem .9rem;border:1px solid var(--gris-borde);border-radius:6px;font-size:.88rem;font-family:inherit;color:var(--texto);resize:vertical;min-height:100px;margin-bottom:.7rem;transition:border-color .2s}
+.foro-textarea:focus{outline:none;border-color:var(--azul-med)}
+.foro-lista{display:flex;flex-direction:column;gap:.8rem;max-height:420px;overflow-y:auto}
+.foro-mensaje{background:var(--blanco);border:1px solid var(--gris-borde);border-left:4px solid var(--dorado);border-radius:var(--radio);padding:1rem 1.2rem;box-shadow:var(--sombra);animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.foro-autor{font-weight:700;font-size:.82rem;color:var(--azul);margin-bottom:.2rem}
+.foro-hora{font-size:.72rem;color:#aab3cc;margin-left:.5rem;font-weight:400}
+.foro-texto{font-size:.87rem;color:var(--texto);line-height:1.6}
+
+/* TABULADOR + GRÁFICA LADO A LADO */
+.tabulador-layout{display:grid;grid-template-columns:1fr 360px;gap:1.5rem;align-items:start}
+@media(max-width:860px){.tabulador-layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <span>Universidad Nacional Autónoma de México</span>
+  <span>
+    <a href="https://www.economia.unam.mx" target="_blank">economia.unam.mx</a>
+    &nbsp;|&nbsp;
+    <a href="https://www.unam.mx" target="_blank">unam.mx</a>
+  </span>
+</div>
+
+<!-- NOTA PROYECTO -->
+<div class="nota-proyecto">
+  <strong>Proyecto Final</strong> &mdash; Materia: Probabilidad y Estadística &nbsp;|&nbsp;
+  Prof. Aguilar Vázquez Eduardo &nbsp;|&nbsp; Semestre 2026-2 &nbsp;|&nbsp;
+  Equipo: <strong>Jiménez Báez Ximena Monserrath &amp; Carlos Proces Ramos Cardenas</strong>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="header-logos">
+      <img src="logo-unam.png" alt="Escudo UNAM"/>
+      <img src="logo-economia.png" alt="Logo Facultad de Economía"/>
+    </div>
+    <div class="header-text">
+      <h1>Facultad de Economía<br><span class="dorado">UNAM</span></h1>
+      <p class="sub">Por mi raza hablará el espíritu &mdash; Ciudad Universitaria, México</p>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#anuncios">Anuncios</a>
+    <a href="#oferta">Oferta Educativa</a>
+    <a href="#enlaces">Trámites</a>
+    <a href="#foro">Foro</a>
+    <a href="#noticias">Ponte al Día</a>
+    <a href="#bibliografia">Bibliografía</a>
+    <a href="#didactica">Economía Didáctica</a>
+    <a href="#acerca">Acerca de</a>
+    <a href="#contacto">Contacto</a>
+    <a href="https://www.economia.unam.mx" target="_blank">Sitio Oficial ↗</a>
+  </div>
+</nav>
+
+<!-- OBJETIVOS -->
+<div class="objetivos-band" id="objetivos">
+  <div class="objetivos-inner">
+    <h2>Objetivos de la Página de Estudiantes de la Facultad de Economía</h2>
+    <div class="objetivos-grid">
+      <div class="obj-item">
+        <h3>Informar y Difundir</h3>
+        <p>Centralizar y compartir información académica, administrativa y de vida universitaria de la Facultad de Economía de forma accesible para toda la comunidad.</p>
+      </div>
+      <div class="obj-item">
+        <h3>Convivencia Digital</h3>
+        <p>Crear un espacio de encuentro virtual entre estudiantes, donde se fomente el intercambio de ideas, experiencias y recursos académicos.</p>
+      </div>
+      <div class="obj-item">
+        <h3>Contenido Didáctico</h3>
+        <p>Difundir material académico de calidad, herramientas de análisis económico y bibliografía recomendada para el desarrollo profesional del estudiante.</p>
+      </div>
+      <div class="obj-item">
+        <h3>Foro Comunitario</h3>
+        <p>Funcionar como un foro compartido para la comunidad estudiantil donde se publiquen convocatorias, noticias, eventos y oportunidades de desarrollo.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO BANNER -->
+<div class="hero">
+  <div class="hero-foto">
+    <!-- Sube foto-facultad.jpg a GitHub con ese nombre exacto -->
+    <img src="foto-facultad.jpg" alt="Facultad de Economía UNAM"
+      onerror="this.parentElement.innerHTML='Sube foto-facultad.jpg a GitHub'"/>
+  </div>
+  <div class="hero-texto">
+    <h2>Tablero de Anuncios y Noticias</h2>
+    <p>Conferencias, convocatorias, informes y eventos de la comunidad académica de la Facultad de Economía, UNAM.</p>
+  </div>
+</div>
+
+<!-- CONTENIDO PRINCIPAL -->
+<main>
+  <section id="anuncios">
+    <h2 class="seccion-titulo">Anuncios Recientes <small style="font-size:.78rem;font-weight:400;color:#aaa;margin-left:.4rem">(7 publicaciones)</small></h2>
+    <div class="grid-anuncios">
+      <article class="card-anuncio">
+      <div class="card-header-row"><span class="badge" style="color:#1a6e3c;background:#e8f5ee;border:1px solid #1a6e3c40">Conferencia</span></div>
+      <h3>Dilemmas of Growth in the Ecological Transition</h3>
+      <div class="card-meta"><span>3 de junio de 2026</span><span>9:00 hrs</span><span>&#128205; En línea vía Webex / Aula 207</span></div>
+      <p class="card-desc">La Facultad de Economía invita a la conferencia internacional impartida por el Dr. Jan Priewe, profesor emérito de Economía de HTW Berlin, especialista en macroeconomía, desarrollo económico y transición ecológica. Registro: alejandro.marquez@economia.unam.mx</p>
+      
+    </article>
+<article class="card-anuncio">
+      <div class="card-header-row"><span class="badge" style="color:#1a6e3c;background:#e8f5ee;border:1px solid #1a6e3c40">Conferencia</span></div>
+      <h3>Conferencia: Perspectivas Económicas de México 2026</h3>
+      <div class="card-meta"><span>12 de junio de 2026</span><span>11:00 hrs</span><span>&#128205; Auditorio Jesús Silva Herzog</span></div>
+      <p class="card-desc">El Dr. Alejandro Díaz analizará los principales indicadores macroeconómicos y los retos de la política fiscal para el segundo semestre del año.</p>
+      
+    </article>
+<article class="card-anuncio">
+      <div class="card-header-row"><span class="badge" style="color:#004a99;background:#e6f0ff;border:1px solid #004a9940">Informe</span></div>
+      <h3>Verano Intersemestrales 2026</h3>
+      <div class="card-meta"><span>8 al 29 de junio de 2026</span><span>Inscripciones: 2 al 4 de junio</span><span>&#128205; Facultad de Economía, UNAM</span></div>
+      <p class="card-desc">La División de Estudios Profesionales informa que se impartirán las siguientes asignaturas: Teoría Macroeconómica II, Taller de Economía Cuantitativa V, Matemáticas II, Introducción a la Econometría y Economía Industrial. Solo podrás inscribir una asignatura. Estos cursos tienen como objetivo fortalecer la trayectoria académica y contribuir a reducir el rezago académico.</p>
+      <a class="btn-ver" href="https://www.economia.unam.mx/secesco/serviciosescolares.html">Ver más &rarr;</a>
+    </article>
+<article class="card-anuncio">
+      <div class="card-header-row"><span class="badge" style="color:#004a99;background:#e6f0ff;border:1px solid #004a9940">Informe</span></div>
+      <h3>Seminario: Economía Circular</h3>
+      <div class="card-meta"><span>3 de junio de 2026</span><span>9:30 – 15:00 hrs</span><span>&#128205; Auditorio Jesús Silva-Herzog, Edificio de Posgrado, FE-UNAM</span></div>
+      <p class="card-desc">Seminario enfocado en la Implementación de la Ley de Economía Circular en México. Programa: 09:30 Inauguración | 10:00 Mesa 1: Marco legal (Dra. Marisol Anglés Hernández y Mtro. Biuludani Altamirano Magaña) | 11:15 Mesa 2: Retos y desafíos (Ing. Arturo Guerrero Jiménez, Ing. Víctor Gómez Céspedes y Mtro. Roberto Castillo Cruz) | 13:00 Mesa 3: Métricas e indicadores (Dra. Julia Cilleruelo Palomero, Dra. Leonor Güereca Hernández y Dr. Alejandro Padilla Rivera) | 14:30 Síntesis y Clausura.</p>
+      
+    </article>
+<article class="card-anuncio">
+      <div class="card-header-row"><span class="badge" style="color:#004a99;background:#e6f0ff;border:1px solid #004a9940">Informe</span></div>
+      <h3>Informe de Actividades 2025 — Facultad de Economía</h3>
+      <div class="card-meta"><span>Publicado: mayo 2026</span></div>
+      <p class="card-desc">Ya disponible el informe anual de actividades académicas, investigación, vinculación y gestión correspondiente al ciclo 2025.</p>
+      
+    </article>
+<article class="card-anuncio">
+      <div class="card-header-row"><span class="badge" style="color:#8b3a00;background:#fff3e6;border:1px solid #8b3a0040">Convocatoria</span></div>
+      <h3>Escuela Avanzada: Macroeconomía Feminista</h3>
+      <div class="card-meta"><span>28 al 30 de octubre de 2026</span><span>Postulación: hasta el 30 de junio</span><span>&#128205; UNAM, Ciudad de México</span></div>
+      <p class="card-desc">¿Te interesa analizar la economía desde una perspectiva de género? Postúlate a la Escuela Avanzada: Macroeconomía Feminista en México y Centroamérica, organizada por la UNAM e IDEA. Dirigida a estudiantes de posgrado en economía o campos relacionados e integrantes de la sociedad civil con experiencia en economía o estudios de género. Informes: natalia.flores@networkideas.org</p>
+      
+    </article>
+<article class="card-anuncio">
+      <div class="card-header-row"><span class="badge" style="color:#8b3a00;background:#fff3e6;border:1px solid #8b3a0040">Convocatoria</span></div>
+      <h3>Monitor y Monitora: Curso de Verano Infantil de Fútbol</h3>
+      <div class="card-meta"><span>Inscripciones hasta el 5 de junio de 2026</span><span>&#128205; Dirección General del Deporte Universitario — deporte.unam.mx</span></div>
+      <p class="card-desc">La Dirección General del Deporte Universitario invita al Curso de Capacitación para selección de monitoras y monitores del Curso Infantil Deportivo y Clínica Infantil de Fútbol Verano 2026. Si tienes entre 18 y 35 años y te apasiona el deporte, la recreación y el trabajo con niñas y niños, esta es tu oportunidad para integrarte a una experiencia universitaria llena de aprendizaje, convivencia y trabajo en equipo.</p>
+      <a class="btn-ver" href="https://deporte.unam.mx">Ver más &rarr;</a>
+    </article>
+    </div>
+  </section>
+
+  <aside class="sidebar">
+    <div class="widget" id="oferta">
+      <p class="widget-titulo">Oferta Educativa</p>
+      <div class="card-carrera">
+      <h3>Licenciatura en Economía</h3>
+      <p>Forma profesionales capaces de analizar, diagnosticar y proponer soluciones a los problemas económicos de México y el mundo.</p>
+    </div>
+<div class="card-carrera">
+      <h3>Posgrado en Economía</h3>
+      <p>Maestría y Doctorado con especialidades en teoría económica, econometría, economía política y desarrollo.</p>
+    </div>
+<div class="card-carrera">
+      <h3>Educación Continua</h3>
+      <p>Diplomados, cursos y talleres de actualización profesional en finanzas, política pública, análisis de datos y más.</p>
+    </div>
+    </div>
+    <div class="widget">
+      <p class="widget-titulo">Facultad en Cifras</p>
+      <div class="stats-grid">
+        <div class="stat-box"><span class="stat-num">+7,000</span><span class="stat-label">Estudiantes</span></div>
+        <div class="stat-box"><span class="stat-num">1929</span><span class="stat-label">Fundación</span></div>
+        <div class="stat-box"><span class="stat-num">+300</span><span class="stat-label">Académicos</span></div>
+        <div class="stat-box"><span class="stat-num">4</span><span class="stat-label">Posgrados</span></div>
+      </div>
+    </div>
+    <div class="widget" id="enlaces">
+      <p class="widget-titulo">Trámites y Servicios</p>
+      <ul class="links-rapidos">
+        <li><a href="https://www.economia.unam.mx/avisos/EA2026GUIASOK.pdf" target="_blank">&bull; Guías EA 2026-2</a></li>
+<li><a href="https://saife.economia.unam.mx/" target="_blank">&bull; Inscripción a Intersemestrales</a></li>
+<li><a href="https://www.siass.unam.mx/" target="_blank">&bull; Servicio Social</a></li>
+<li><a href="https://www.economia.unam.mx/seciab.html" target="_blank">&bull; Intercambio Académico</a></li>
+<li><a href="https://132.248.45.5/noticias/pdfs/nuevoreglamentodeexamensprofs2005.pdf" target="_blank">&bull; Examen Profesional</a></li>
+<li><a href="https://www.economia.unam.mx/secss/guia/" target="_blank">&bull; Requisitos de Titulación</a></li>
+<li><a href="https://www.oferta.unam.mx/planestudios/economia-cu-plandestudios13.pdf" target="_blank">&bull; Plan de Estudios</a></li>
+<li><a href="https://www.facebook.com/FEconomiaUNAM" target="_blank">&bull; Facebook FE UNAM</a></li>
+<li><a href="https://www.instagram.com/estudiantiles.economia/" target="_blank">&bull; Instagram Estudiantiles</a></li>
+      </ul>
+    </div>
+    <div class="widget" id="contacto">
+      <p class="widget-titulo">Contacto</p>
+      <div class="contacto-info">
+        <p><span>&#128205;</span> Circuito Interior s/n, Coyoacán, Ciudad Universitaria, CDMX</p>
+        <p><span>&#9993;</span> <a href="mailto:escolares@economia.unam.mx" style="color:var(--azul-med)">escolares@economia.unam.mx</a></p>
+        <p><span>&#128336;</span> Lunes a viernes, 8:00 – 20:00 hrs</p>
+      </div>
+      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gris-borde)">
+        <p style="font-size:.78rem;font-weight:700;color:var(--azul);margin-bottom:.5rem;letter-spacing:.05em;text-transform:uppercase">Administradores de la Página</p>
+        <p style="font-size:.86rem;font-weight:600;color:var(--texto);margin-bottom:.25rem">&bull; Jiménez Báez Ximena Monserrath</p>
+        <p style="font-size:.86rem;font-weight:600;color:var(--texto);margin-bottom:.35rem">&bull; Ramos Cardenas Carlos Proces</p>
+        <p style="font-size:.82rem;color:var(--texto-sub);margin-bottom:.25rem">&bull; Estudiantes de 8° semestre</p>
+        <p style="font-size:.82rem;color:var(--texto-sub);margin-bottom:.25rem">&bull; Facultad de Economía, UNAM</p>
+        <p style="font-size:.82rem">&bull; <a href="mailto:ximena.jimenez.baez.m@gmail.com" style="color:var(--azul-med)">ximena.jimenez.baez.m@gmail.com</a></p>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- FORO DE OPINIONES DE LA COMUNIDAD -->
+<div class="banda" id="foro">
+  <h2 class="banda-titulo">Foro de Opiniones de la Comunidad</h2>
+  <p style="font-size:.87rem;color:var(--texto-sub);margin-bottom:1.2rem;line-height:1.6">Comparte tu opinión, pregunta o reflexión con la comunidad estudiantil. Las publicaciones se guardan durante la sesión de navegación.</p>
+  <div class="foro-layout">
+    <div class="foro-form-card">
+      <h3>✏️ Nueva publicación</h3>
+      <input class="foro-input" id="foro-nombre" type="text" placeholder="Tu nombre o alias (ej. Ximena M.)" maxlength="60"/>
+      <textarea class="foro-textarea" id="foro-mensaje" placeholder="Escribe tu opinión, pregunta o comentario sobre economía, vida universitaria, noticias..." maxlength="600"></textarea>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:.7rem">
+        <span id="foro-contador" style="font-size:.75rem;color:var(--texto-sub)">0 / 600</span>
+        <button class="btn-calc" onclick="publicarMensaje()" style="padding:.6rem 1.5rem">Publicar ↩</button>
+      </div>
+      <p id="foro-error" style="font-size:.78rem;color:#c0392b;margin-top:.4rem;display:none">Por favor completa tu nombre y mensaje.</p>
+    </div>
+    <div>
+      <p style="font-family:'Playfair Display',serif;font-size:.9rem;color:var(--azul);margin-bottom:.8rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding-bottom:.4rem;border-bottom:1px solid var(--gris-borde)">Publicaciones recientes</p>
+      <div class="foro-lista" id="foro-lista">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GALERÍA EXTRA -->
+<div class="banda">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem">
+    <div class="foto-slot" style="min-height:180px">
+      <img src="foto-extra-1.jpg" alt="Foto extra 1"
+        onerror="this.parentElement.innerHTML='foto-extra-1.jpg'"/>
+    </div>
+    <div class="foto-slot" style="min-height:180px">
+      <img src="foto-extra-2.jpg" alt="Foto extra 2"
+        onerror="this.parentElement.innerHTML='foto-extra-2.jpg'"/>
+    </div>
+    <div class="foto-slot" style="min-height:180px">
+      <img src="foto-extra-3.jpg" alt="Foto extra 3"
+        onerror="this.parentElement.innerHTML='foto-extra-3.jpg'"/>
+    </div>
+  </div>
+</div>
+
+<!-- PONTE AL DÍA EN LA ECONOMÍA -->
+<div class="banda" id="noticias">
+  <h2 class="banda-titulo">Ponte al Día en la Economía</h2>
+  <div class="noticias-grid">
+    <div class="card-noticia">
+      <p class="fuente">El Financiero &mdash; 1 jun 2026</p>
+      <h3>Hacienda destaca factores que impulsan la economía en México</h3>
+      <p>El mercado laboral sólido, las alzas salariales y las transferencias sociales están fortaleciendo el consumo interno en México, de acuerdo con la Secretaría de Hacienda y Crédito Público.</p>
+      <a href="https://www.elfinanciero.com.mx/economia/2026/06/01/hacienda-destaca-factores-que-impulsan-a-la-economia-en-mexico/" target="_blank">Leer nota completa &rarr;</a>
+    </div>
+    <div class="card-noticia">
+      <p class="fuente">DW Español &mdash; 2026</p>
+      <h3>Expertos descartan la recuperación económica de Alemania</h3>
+      <p>El Consejo de Expertos Económicos alemán presentó previsiones por debajo de lo esperado: la economía crecería apenas 0.5% en 2026. La guerra con Irán y la crisis energética frustran las expectativas de recuperación.</p>
+      <a href="https://www.dw.com/es/expertos-descartan-la-recuperación-económica-de-alemania/a-77320800" target="_blank">Leer nota completa &rarr;</a>
+    </div>
+  </div>
+</div>
+
+<!-- BIBLIOGRAFÍA RECOMENDADA -->
+<div class="banda" id="bibliografia">
+  <h2 class="banda-titulo">Bibliografía Recomendada de la Semana</h2>
+  <div class="biblio-grid">
+    <div class="biblio-item">
+      <p class="biblio-autor">Adam Smith</p>
+      <p class="biblio-obra">La Riqueza de las Naciones (1776)</p>
+      <p class="biblio-desc">Obra fundacional del pensamiento económico moderno sobre la división del trabajo y el libre mercado.</p>
+    </div>
+<div class="biblio-item">
+      <p class="biblio-autor">John M. Keynes</p>
+      <p class="biblio-obra">Teoría General del Empleo, el Interés y el Dinero (1936)</p>
+      <p class="biblio-desc">Base de la macroeconomía moderna y la intervención del Estado en la economía.</p>
+    </div>
+<div class="biblio-item">
+      <p class="biblio-autor">Milton Friedman</p>
+      <p class="biblio-obra">Una Historia Monetaria de los Estados Unidos (1963)</p>
+      <p class="biblio-desc">Análisis del papel de la oferta monetaria en los ciclos económicos.</p>
+    </div>
+<div class="biblio-item">
+      <p class="biblio-autor">Amartya Sen</p>
+      <p class="biblio-obra">Desarrollo y Libertad (1999)</p>
+      <p class="biblio-desc">Enfoque del desarrollo como expansión de libertades fundamentales de los individuos.</p>
+    </div>
+<div class="biblio-item">
+      <p class="biblio-autor">Thomas Piketty</p>
+      <p class="biblio-obra">El Capital en el Siglo XXI (2013)</p>
+      <p class="biblio-desc">Análisis empírico de la desigualdad de riqueza e ingresos en perspectiva histórica.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ECONOMÍA DIDÁCTICA -->
+<div class="banda" id="didactica">
+  <h2 class="banda-titulo">Economía Didáctica</h2>
+  <div class="didactica-grid">
+
+    <!-- CALCULADORA DE TIPO DE CAMBIO -->
+    <div class="didactica-card">
+      <h3>Calculadora de Tipo de Cambio</h3>
+      <div class="tipo-cambio-form">
+        <label for="monto">Cantidad en pesos mexicanos (MXN)</label>
+        <input type="number" id="monto" placeholder="Ej. 1000" min="0" step="any"/>
+        <label for="moneda">Convertir a</label>
+        <select id="moneda">
+          <option value="USD">Dólares estadounidenses (USD)</option>
+          <option value="EUR">Euros (EUR)</option>
+        </select>
+        <button class="btn-calc" onclick="calcularTipoCambio()">Calcular</button>
+        <div class="resultado-tc" id="resultado-tc">El resultado aparecerá aquí</div>
+        <p class="grafica-nota" id="tc-nota"></p>
+      </div>
+    </div>
+
+    <!-- GRÁFICA BANXICO -->
+    <div class="didactica-card">
+      <h3>Tasa de Interés Banxico — Últimos 6 Meses</h3>
+      <canvas id="graficaBanxico" height="180"></canvas>
+      <p class="grafica-nota">
+        La tasa de interés objetivo del Banco de México es el principal instrumento de política monetaria. Una tasa alta encarece el crédito y modera la inflación; una tasa baja estimula la inversión y el consumo. En 2026 Banxico ha mantenido una tendencia a la baja en respuesta a la moderación inflacionaria.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- TABULADOR BANXICO + GRÁFICA -->
+  <div style="margin-top:1.5rem">
+    <div class="didactica-card" style="max-width:100%">
+      <h3>Tabulador de Indicadores Banxico</h3>
+      <p style="font-size:.82rem;color:var(--texto-sub);margin-bottom:1rem;line-height:1.5">
+        Selecciona uno o varios indicadores y el periodo que deseas consultar. El tabulador genera una tabla comparativa con los datos históricos del Banco de México, y la gráfica se actualiza automáticamente.
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1rem">
+        <div>
+          <label style="font-size:.8rem;font-weight:700;color:var(--texto-sub);display:block;margin-bottom:.4rem">Indicadores a incluir</label>
+          <div style="display:flex;flex-direction:column;gap:.3rem;font-size:.85rem">
+            <label><input type="checkbox" id="chk-tasa" checked> Tasa de interés objetivo (%)</label>
+            <label><input type="checkbox" id="chk-inflacion" checked> Inflación general (%)</label>
+            <label><input type="checkbox" id="chk-tipo"> Tipo de cambio MXN/USD</label>
+            <label><input type="checkbox" id="chk-reservas"> Reservas internacionales (MDD)</label>
+            <label><input type="checkbox" id="chk-cetes"> CETES 28 días (%)</label>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:.8rem;font-weight:700;color:var(--texto-sub);display:block;margin-bottom:.4rem">Periodo</label>
+          <select id="sel-periodo" style="width:100%;padding:.5rem;border:1px solid var(--gris-borde);border-radius:6px;font-size:.85rem;font-family:inherit">
+            <option value="6">Últimos 6 meses</option>
+            <option value="12">Último año</option>
+            <option value="24">Últimos 2 años</option>
+            <option value="36">Últimos 3 años</option>
+          </select>
+          <label style="font-size:.8rem;font-weight:700;color:var(--texto-sub);display:block;margin:.7rem 0 .4rem">Formato de tabla</label>
+          <select id="sel-formato" style="width:100%;padding:.5rem;border:1px solid var(--gris-borde);border-radius:6px;font-size:.85rem;font-family:inherit">
+            <option value="mensual">Mensual</option>
+            <option value="trimestral">Trimestral</option>
+            <option value="semestral">Semestral</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:flex-end;gap:.5rem">
+          <button class="btn-calc" onclick="generarTabulado()" style="width:100%">Generar Tabulado</button>
+          <button class="btn-calc" onclick="exportarCSV()" style="width:100%;background:#1a6e3c">Exportar CSV</button>
+        </div>
+      </div>
+      <div id="contenedor-tabulado" style="overflow-x:auto"></div>
+      <p style="font-size:.75rem;color:var(--texto-sub);margin-top:.7rem;font-style:italic">
+        Nota: Datos de series históricas de referencia Banxico. Visita <a href="https://www.banxico.org.mx" target="_blank" style="color:var(--azul-med)">banxico.org.mx</a> para datos en tiempo real.
+      </p>
+      <div id="contenedor-grafica-tab" style="margin-top:1.4rem;display:none">
+        <p style="font-size:.78rem;font-weight:700;color:var(--texto-sub);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.04em;padding-top:.8rem;border-top:1px solid var(--gris-borde)">Gráfica del periodo seleccionado</p>
+        <canvas id="graficaTabulador" style="width:100%;max-height:240px"></canvas>
+        <p class="grafica-nota" style="margin-top:.5rem" id="nota-grafica-tab"></p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ACERCA DE LA FACULTAD -->
+<div class="banda" id="acerca">
+  <h2 class="banda-titulo">Acerca de la Facultad de Economía</h2>
+  <div class="acerca-layout">
+    <div>
+      <div id="mapa-facultad"></div>
+      <p style="font-size:.78rem;color:var(--texto-sub);margin-top:.4rem">Circuito Interior s/n, Ciudad Universitaria, Coyoacán, CDMX</p>
+      <p style="font-size:.88rem;color:var(--texto);line-height:1.75;margin-top:1rem;padding:1rem;background:var(--azul-claro);border-radius:var(--radio);border-left:4px solid var(--azul)">
+        La Facultad de Economía de la UNAM es la dependencia académica encargada de la docencia e investigación en ciencias económicas. Su objetivo es el análisis científico de la producción, distribución y consumo de bienes, formando profesionales críticos que participen en la solución de problemas económicos, sociales y financieros de México.
+      </p>
+    </div>
+    <div>
+      <div class="fotos-facultad">
+        <div class="foto-slot foto-slot-grande">
+          <img src="foto-campus-1.jpg" alt="Facultad de Economía"
+            onerror="this.parentElement.innerHTML='foto-campus-1.jpg'"/>
+        </div>
+        <div class="foto-slot">
+          <img src="foto-campus-2.jpg" alt="Campus"
+            onerror="this.parentElement.innerHTML='foto-campus-2.jpg'"/>
+        </div>
+        <div class="foto-slot">
+          <img src="foto-campus-3.jpg" alt="Campus"
+            onerror="this.parentElement.innerHTML='foto-campus-3.jpg'"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- FOOTER -->
+<footer>
+  <strong>Facultad de Economía — Universidad Nacional Autónoma de México</strong><br>
+  Ciudad Universitaria, Delegación Coyoacán, C.P. 04510, CDMX<br>
+  &copy; 2026 UNAM &middot; Todos los derechos reservados<br>
+  <p class="presentacion">PRESENTACIÓN FINAL &mdash; JIMÉNEZ BÁEZ &amp; RAMOS CARDENAS</p>
+</footer>
+
+<script>
+// ── TABULADOR BANXICO ─────────────────────────
+const MESES_BASE = [
+  'Jun 2023','Jul 2023','Ago 2023','Sep 2023','Oct 2023','Nov 2023',
+  'Dic 2023','Ene 2024','Feb 2024','Mar 2024','Abr 2024','May 2024',
+  'Jun 2024','Jul 2024','Ago 2024','Sep 2024','Oct 2024','Nov 2024',
+  'Dic 2024','Ene 2025','Feb 2025','Mar 2025','Abr 2025','May 2025',
+  'Jun 2025','Jul 2025','Ago 2025','Sep 2025','Oct 2025','Nov 2025',
+  'Dic 2025','Ene 2026','Feb 2026','Mar 2026','Abr 2026','May 2026'
+];
+
+// Cada arreglo tiene 36 valores, uno por mes, en orden cronológico (Jun 2023 → May 2026)
+const DATOS_BANXICO = {
+  tasa: {
+    label: "Tasa objetivo (%)",
+    vals:  [11.25,11.25,11.25,11.25,11.25,11.25,
+            11.25,11.25,11.25,11.25,11.25,11.25,
+            11.25,11.25,11.00,11.00,10.50,10.50,
+            10.00,10.00,9.50, 9.50, 9.00, 9.00,
+            9.00, 9.00, 9.00, 9.00, 9.00, 9.00,
+            9.00, 9.00, 8.50, 8.50, 8.50, 8.50]
+  },
+  inflacion: {
+    label: "Inflación general (%)",
+    vals:  [5.18, 4.79, 4.64, 4.45, 4.26, 4.32,
+            4.66, 4.88, 4.40, 4.42, 4.65, 4.69,
+            4.98, 5.57, 4.99, 4.58, 4.76, 4.55,
+            4.21, 3.59, 3.77, 3.80, 3.93, 3.93,
+            3.96, 3.96, 3.83, 3.91, 3.77, 3.76,
+            3.64, 3.67, 3.80, 3.99, 4.10, 4.21]
+  },
+  tipo: {
+    label: "Tipo de cambio MXN/USD",
+    vals:  [17.18,17.05,17.12,17.22,18.07,17.39,
+            17.06,17.15,17.10,16.72,17.12,17.22,
+            18.42,18.10,19.55,19.68,19.89,20.28,
+            20.18,20.47,20.34,19.92,16.98,17.03,
+            17.35,17.65,19.80,19.63,20.15,20.32,
+            20.50,20.62,20.48,20.35,20.20,20.05]
+  },
+  reservas: {
+    label: "Reservas internacionales (MDD)",
+    vals:  [201500,200800,200200,202000,203100,204500,
+            204800,205200,206000,206800,207500,208100,
+            209400,210200,211500,212800,214500,215800,
+            217200,218100,219500,220300,221000,220800,
+            219900,218700,217500,216800,215900,215200,
+            214800,214100,213500,212900,212300,211800]
+  },
+  cetes: {
+    label: "CETES 28 días (%)",
+    vals:  [11.16,11.16,11.16,11.16,11.16,11.16,
+            11.16,11.16,11.16,11.16,11.16,11.16,
+            11.16,11.16,10.90,10.90,10.40,10.40,
+            9.90, 9.90, 9.40, 9.40, 8.95, 8.95,
+            8.95, 8.95, 8.95, 8.95, 8.95, 8.95,
+            8.95, 8.95, 8.50, 8.50, 8.50, 8.50]
+  },
+};
+
+let ultimoTabulado = null;
+
+function generarTabulado() {
+  const periodo      = parseInt(document.getElementById('sel-periodo').value);
+  const formato      = document.getElementById('sel-formato').value;
+  const checks       = {
+    tasa:      document.getElementById('chk-tasa').checked,
+    inflacion: document.getElementById('chk-inflacion').checked,
+    tipo:      document.getElementById('chk-tipo').checked,
+    reservas:  document.getElementById('chk-reservas').checked,
+    cetes:     document.getElementById('chk-cetes').checked
+  };
+  const seleccionados = Object.keys(checks).filter(k => checks[k]);
+  if (!seleccionados.length) { alert('Selecciona al menos un indicador.'); return; }
+
+  // Tomar los últimos N meses
+  const mesesBase = MESES_BASE.slice(-periodo);
+  let meses = mesesBase;
+  if (formato === 'trimestral') meses = mesesBase.filter((_,i) => (i + 1) % 3 === 0);
+  if (formato === 'semestral')  meses = mesesBase.filter((_,i) => (i + 1) % 6 === 0);
+
+  // Construir tabla
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;margin-top:.5rem">';
+  html += '<thead><tr style="background:var(--azul);color:white">';
+  html += '<th style="padding:.5rem .7rem;text-align:left;white-space:nowrap">Periodo</th>';
+  seleccionados.forEach(k => {
+    html += `<th style="padding:.5rem .7rem;text-align:right;white-space:nowrap">${DATOS_BANXICO[k].label}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  meses.forEach((mes, fi) => {
+    const idx = MESES_BASE.indexOf(mes); // posición global en el arreglo de 36
+    const bg  = fi % 2 === 0 ? '#f9fafc' : 'white';
+    html += `<tr style="background:${bg};border-bottom:1px solid var(--gris-borde)">`;
+    html += `<td style="padding:.45rem .7rem;font-weight:600;color:var(--azul)">${mes}</td>`;
+    seleccionados.forEach(k => {
+      const val  = DATOS_BANXICO[k].vals[idx];
+      const disp = (val !== undefined && val !== null)
+        ? val.toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2})
+        : '—';
+      html += `<td style="padding:.45rem .7rem;text-align:right">${disp}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+
+  // Promedios del periodo seleccionado
+  html += '<div style="margin-top:.6rem;padding:.5rem .7rem;background:var(--dorado-cl);border-radius:6px;font-size:.78rem;color:#7a5800;flex-wrap:wrap;display:flex;gap:.4rem">';
+  html += '<strong style="width:100%">Promedios del periodo:</strong>';
+  seleccionados.forEach(k => {
+    const idxs = meses.map(m => MESES_BASE.indexOf(m));
+    const vals = idxs.map(i => DATOS_BANXICO[k].vals[i]).filter(v => v !== undefined);
+    if (vals.length) {
+      const prom = (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(2);
+      html += `<span>${DATOS_BANXICO[k].label}: <strong>${prom}</strong></span>`;
+    }
+  });
+  html += '</div>';
+
+  ultimoTabulado = { meses, seleccionados };
+  document.getElementById('contenedor-tabulado').innerHTML = html;
+  actualizarGraficaTabulador(meses, seleccionados);
+}
+
+function exportarCSV() {
+  if (!ultimoTabulado) { alert('Primero genera un tabulado.'); return; }
+  const { meses, seleccionados } = ultimoTabulado;
+  let csv = 'Periodo,' + seleccionados.map(k => DATOS_BANXICO[k].label).join(',') + '\n';
+  meses.forEach(mes => {
+    const idx  = MESES_BASE.indexOf(mes);
+    let fila   = mes;
+    seleccionados.forEach(k => {
+      const val = DATOS_BANXICO[k].vals[idx];
+      fila += ',' + (val !== undefined ? val : '');
+    });
+    csv += fila + '\n';
+  });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'indicadores_banxico.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  generarTabulado();
+});
+document.addEventListener("DOMContentLoaded", function() {
+  var map = L.map('mapa-facultad').setView([19.3328, -99.1838], 16);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+  L.marker([19.3328, -99.1838])
+    .addTo(map)
+    .bindPopup('<strong>Facultad de Economía, UNAM</strong><br>Ciudad Universitaria')
+    .openPopup();
+});
+
+// ── CALCULADORA TIPO DE CAMBIO ────────────────
+async function calcularTipoCambio() {
+  const monto   = parseFloat(document.getElementById('monto').value);
+  const moneda  = document.getElementById('moneda').value;
+  const resDiv  = document.getElementById('resultado-tc');
+  const notaDiv = document.getElementById('tc-nota');
+
+  if (!monto || monto <= 0) {
+    resDiv.textContent = 'Por favor ingresa una cantidad válida.';
+    return;
+  }
+  resDiv.textContent = 'Obteniendo tipo de cambio...';
+  try {
+    const resp = await fetch(`https://api.exchangerate-api.com/v4/latest/MXN`);
+    const data = await resp.json();
+    const tasa  = data.rates[moneda];
+    const conv  = (monto * tasa).toFixed(2);
+    const sym   = moneda === 'USD' ? '$' : '€';
+    resDiv.textContent = `${monto.toLocaleString('es-MX')} MXN = ${sym} ${parseFloat(conv).toLocaleString('en-US', {minimumFractionDigits:2})} ${moneda}`;
+    notaDiv.textContent = `Tipo de cambio actual: 1 MXN = ${tasa.toFixed(6)} ${moneda} (fuente: ExchangeRate-API)`;
+  } catch(e) {
+    resDiv.textContent = 'No se pudo obtener el tipo de cambio. Intenta más tarde.';
+  }
+}
+
+// ── GRÁFICA BANXICO ───────────────────────────
+const ctxBanxico = document.getElementById('graficaBanxico').getContext('2d');
+new Chart(ctxBanxico, {
+  type: 'line',
+  data: {
+    labels: ['Dic 2025','Ene 2026','Feb 2026','Mar 2026','Abr 2026','May 2026'],
+    datasets: [{
+      label: 'Tasa objetivo Banxico (%)',
+      data: [10.00, 9.50, 9.50, 9.00, 9.00, 8.50],
+      borderColor: '#003f8a',
+      backgroundColor: 'rgba(0,63,138,0.08)',
+      borderWidth: 2.5,
+      pointBackgroundColor: '#c8960c',
+      pointRadius: 5,
+      tension: 0.3,
+      fill: true
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y}%` } }
+    },
+    scales: {
+      y: {
+        min: 8,
+        max: 11,
+        ticks: { callback: v => v + '%', font: { size: 11 } },
+        grid: { color: '#eee' }
+      },
+      x: { ticks: { font: { size: 10 } } }
+    }
+  }
+});
+
+// ── GRÁFICA DEL TABULADOR ────────────────────
+let graficaTab = null;
+
+function actualizarGraficaTabulador(meses, seleccionados) {
+  const COLORES = [
+    { border: '#003f8a', bg: 'rgba(0,63,138,0.10)' },
+    { border: '#c8960c', bg: 'rgba(200,150,12,0.10)' },
+    { border: '#1a6e3c', bg: 'rgba(26,110,60,0.10)' },
+    { border: '#8b3a00', bg: 'rgba(139,58,0,0.10)' },
+    { border: '#5b0080', bg: 'rgba(91,0,128,0.10)' },
+  ];
+  const mostrar  = seleccionados.slice(0, 2);
+  const datasets = mostrar.map((k, i) => ({
+    label: DATOS_BANXICO[k].label,
+    data:  meses.map(m => DATOS_BANXICO[k].vals[MESES_BASE.indexOf(m)]),
+    borderColor: COLORES[i].border,
+    backgroundColor: COLORES[i].bg,
+    borderWidth: 2.5,
+    pointBackgroundColor: COLORES[i].border,
+    pointRadius: meses.length <= 12 ? 4 : 2,
+    tension: 0.3,
+    fill: true,
+    yAxisID: mostrar.length > 1 ? (i === 0 ? 'y' : 'y1') : 'y'
+  }));
+
+  const ctx = document.getElementById('graficaTabulador').getContext('2d');
+  if (graficaTab) graficaTab.destroy();
+  document.getElementById('contenedor-grafica-tab').style.display = 'block';
+
+  const scales = {
+    y: { position:'left', ticks:{font:{size:10}}, grid:{color:'#eee'} }
+  };
+  if (mostrar.length > 1) {
+    scales.y1 = { position:'right', ticks:{font:{size:10}}, grid:{drawOnChartArea:false} };
+  }
+
+  graficaTab = new Chart(ctx, {
+    type: 'line',
+    data: { labels: meses, datasets },
+    options: {
+      responsive: true,
+      interaction: { mode:'index', intersect:false },
+      plugins: {
+        legend: { display: mostrar.length > 1, labels:{font:{size:10}} },
+        tooltip: {}
+      },
+      scales
+    }
+  });
+
+  const nota = document.getElementById('nota-grafica-tab');
+  if (nota) nota.textContent = mostrar.length > 1
+    ? `Eje izquierdo: ${DATOS_BANXICO[mostrar[0]].label} · Eje derecho: ${DATOS_BANXICO[mostrar[1]].label}`
+    : `Indicador: ${DATOS_BANXICO[mostrar[0]].label}`;
+}
+
+// ── FORO DE OPINIONES ─────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  const ta = document.getElementById('foro-mensaje');
+  const counter = document.getElementById('foro-contador');
+  if (ta && counter) {
+    ta.addEventListener('input', () => {
+      counter.textContent = ta.value.length + ' / 600';
+    });
+  }
+});
+
+function publicarMensaje() {
+  const nombre   = document.getElementById('foro-nombre').value.trim();
+  const mensaje  = document.getElementById('foro-mensaje').value.trim();
+  const errorDiv = document.getElementById('foro-error');
+  if (!nombre || !mensaje) { errorDiv.style.display = 'block'; return; }
+  errorDiv.style.display = 'none';
+
+  const hora = new Date().toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'});
+  const div  = document.createElement('div');
+  div.className = 'foro-mensaje';
+  div.innerHTML = `<p class="foro-autor">${escHtml(nombre)} <span class="foro-hora">${hora}</span></p>
+    <p class="foro-texto">${escHtml(mensaje)}</p>`;
+
+  const lista = document.getElementById('foro-lista');
+  lista.insertBefore(div, lista.firstChild);
+  document.getElementById('foro-nombre').value  = '';
+  document.getElementById('foro-mensaje').value = '';
+  document.getElementById('foro-contador').textContent = '0 / 600';
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
